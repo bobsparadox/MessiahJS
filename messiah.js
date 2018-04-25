@@ -7,7 +7,7 @@ function messiah(selector) {
   me.whoAmI = function() {
     return me.element;
   };
-  me.pickUs = function() {
+  me.whoAreWe = function() {
     return me.elements;
   };
   me.myValues = function(name, value) {
