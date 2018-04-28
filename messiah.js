@@ -1,75 +1,7 @@
-
-
-const T = function(selector) {
-  const me = {};
-  me.selector = selector;
-  me.element = document.querySelector(me.selector);
-  me.elements = document.querySelectorAll(me.selector);
-  //returns selected element or elements
-  me.Element = function() {
-    return me.elements;
-  };
-
-  //returns attributes or changes attributes
-  me.myValues = function(name, value) {
-    if (!value) {
-      return me.element.getAttribute(name);
-    }
-    me.element.setAttribute(name, value);
-    return me;
-  };
-
-  //performs callback on event. Events found in vanilla js on + "some vanillaJs Event type"
-  me.divineIntervention = function(type, callBack) {
-    me.element['on' + type] = callBack;
-    return me;
-  };
-
-  //inserts element of type into selected element;
-  me.createInnerBeing = function(type) {
-    type = document.createElement(type);
-    me.element.appendChild(type);
-    return me;
-  };
-
-  //toggles a class on selected element
-  me.lukeWarm = function(meClass) {
-    me.element.classList.toggle(meClass);
-    return me;
-  };
-
-  //inserts element of type around selected element
-  me.embraceBeing = function(type) {
-    let parent = me.element.parentNode;
-    let outerBeing = document.createElement(type);
-
-    parent.replaceChild(outerBeing, me.element);
-    outerBeing.appendChild(me.element);
-    return me;
-  };
-
-  me.scripture = function(scr) {
-    me.element.textContent = scr;
-    return me;
-  };
-
-  //JSON GET request
-  me.JSONchrist = function(url, callback) {
-    return fetch(url, {method: 'GET'
-    }).then(function(response) {
-      return response.json();
-    }).then(function(data) {
-      callback(data);
-    }).catch(function(err) {
-      return err;
-    });
-  };
-
-  return me;
-};
-
 const Prophet = function(userObject) {
-  let mount = document.getElementById(userObject.Id);
+  this.Id = userObject.Id;
+  this.data = userObject.data;
+  let mount = document.getElementById(this.Id);
   let vdom = {};
 
   function readNode(node) {
@@ -83,11 +15,12 @@ const Prophet = function(userObject) {
       content = content.replace(/\s+/g, '');
       rv.type = 'text';
     };
+
     if (content.length == 0) {return; };
 
     rv.type = String(rv.type).toLowerCase();
-
     rv.content = node.textContent.trim();
+    rv.dataType = node.textContent.trim();
 
     //generate id for this node
     rv.id = (rv.type + '_' + genId()).toLocaleLowerCase();
@@ -113,6 +46,7 @@ const Prophet = function(userObject) {
         b--;
         continue;
       };
+
       //adding reference to the parent
       newNode.parId = rv.id;
       newNode.parType = rv.type;
@@ -121,20 +55,19 @@ const Prophet = function(userObject) {
       //saving the DOM node to vdom
       vdom[newNode.id] = newNode;
     };
-
     return rv;
   };
 
   function genId() {
     return Math.floor(Math.random() * 9999999);
   };
+
   readNode(mount);
 
   function setNode(node) {
     for (let i = 0, j = 0; i < Object.keys(vdom).length; i++, j++) {
       let element = Object.keys(vdom)[i];
       let currentNode = vdom[element];
-
     }
   };
 
@@ -147,7 +80,6 @@ const Prophet = function(userObject) {
       if ((domObject[element].type) == 'prophet') {
         domObject[element].content = renderObj[domObject[element].content];
       };
-
     }
     return domObject;
   };
@@ -183,17 +115,8 @@ const Prophet = function(userObject) {
     return true;
   };
 
-  function contains(selector, text) {
-    var elements = document.querySelectorAll(selector);
-    return Array.prototype.filter.call(elements, function(element) {
-      return RegExp(text).test(element.textContent);
-    });
-  }
-
   let keys = [];
-
-  let obj = userObject.data;
-
+  obj = this.data;
   for (let key in obj) {
     keys.push(key);
   };
@@ -212,12 +135,10 @@ const Prophet = function(userObject) {
     }
     let proTags = document.getElementsByTagName('prophet');
     for (let l = 0; l < proTags.length; l++) {
-      for (let k = 0; k < keys.length; k++) {
-        if (proTags[l].innerHTML == keys[k]) {
-          proTags[l].innerHTML = obj[keys[k]];
-        };
-      }
-
+      let k = 0;
+      if (arrNewChange[l].dataType = proTags[l].innerHTML) {
+        proTags[l].innerHTML = arrNewChange[l].content;
+      };
     };
   };
 };
