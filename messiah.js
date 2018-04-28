@@ -1,11 +1,10 @@
 
 
-function T(selector) {
+const T = function(selector) {
   const me = {};
   me.selector = selector;
   me.element = document.querySelector(me.selector);
   me.elements = document.querySelectorAll(me.selector);
-
   //returns selected element or elements
   me.Element = function() {
     return me.elements;
@@ -55,14 +54,171 @@ function T(selector) {
   };
 
   //JSON GET request
-  me.JSONchrist = function(url) {
+  me.JSONchrist = function(url, callback) {
     return fetch(url, {method: 'GET'
     }).then(function(response) {
       return response.json();
+    }).then(function(data) {
+      callback(data);
     }).catch(function(err) {
       return err;
     });
   };
 
+  me.Prophet = function(object) {
+    html = document.querySelector(object.prophet);
+    return document.querySelector(object.prophet);
+  };
+
   return me;
+};
+
+let mount = document.getElementById('main');
+let dom = mount.innerHTML;
+let vdom = {};
+
+function readNode(node) {
+  let rv = {};
+
+  //tag names
+  rv.type = node.tagName ? node.tagName : node.nodeType;
+
+  let content = node.textContent;
+  if (rv.type == 3) {
+    content = content.replace(/\s+/g, '');
+    rv.type = 'text';
+  };
+  if (content.length == 0) {return; };
+
+  rv.type = String(rv.type).toLowerCase();
+
+  rv.content = node.textContent.trim();
+
+  //generate id for this node
+  rv.id = (rv.type + '_' + genId()).toLocaleLowerCase();
+
+  //attributes
+  rv.attrs = {};
+
+  if (node.attributes) {
+    for (let a = 0; a < node.attributes.length; a++) {
+
+      let attr = node.attributes[a];
+      rv.attrs[attr.nodeName] = attr.nodeValue;
+
+    };
+  };
+
+  for (let c = 0, b = 0; c < node.childNodes.length; c++, b++) {
+    //referencing current child
+    let child = node.childNodes[c];
+    //documenting child in JSON
+    let newNode = readNode(child);
+    if (!newNode) {
+      b--;
+      continue;
+    };
+    //adding reference to the parent
+    newNode.parId = rv.id;
+    newNode.parType = rv.type;
+    //keeping position relative to parent
+    newNode.parIdx = b;
+    //saving the DOM node to vdom
+    vdom[newNode.id] = newNode;
+  };
+
+  return rv;
+};
+
+function genId() {
+  return Math.floor(Math.random() * 9999999);
+};
+readNode(mount);
+
+function setNode(node) {
+  for (let i = 0, j = 0; i < Object.keys(vdom).length; i++, j++) {
+    let element = Object.keys(vdom)[i];
+    let currentNode = vdom[element];
+
+  }
+};
+
+function injectVar(domObject, renderObj) {
+  domObject = JSON.parse(JSON.stringify(domObject));
+  let j = 0;
+  for (let i = 0; i < Object.keys(domObject).length; i++) {
+
+    let element = Object.keys(domObject)[i];
+    if ((domObject[element].type) == 'prophet') {
+      domObject[element].content = renderObj[domObject[element].content];
+    };
+
+  }
+  return domObject;
+};
+
+//function to compare objects
+Object.compare = function(obj1, obj2) {
+  //Loop through properties in object 1
+  for (var p in obj1) {
+    //Check property exists on both objects
+    if (obj1.hasOwnProperty(p) !== obj2.hasOwnProperty(p)) {return false;};
+
+    switch (typeof (obj1[p])) {
+    //Deep compare objects
+    case 'object':
+      if (!Object.compare(obj1[p], obj2[p])) {return false;};
+    break;
+    //Compare function code
+    case 'function':
+      if (typeof (obj2[p]) == 'undefined' ||
+      (p != 'compare' &&
+      obj1[p].toString() != obj2[p].toString())) {return false;};
+    break;
+    //Compare values
+    default:
+      if (obj1[p] != obj2[p]) {return false;};
+  }
+  }
+
+  //Check object 2 for any extra properties
+  for (var p in obj2) {
+    if (typeof (obj1[p]) == 'undefined') {return false;};
+  }
+  return true;
+};
+
+function contains(selector, text) {
+  var elements = document.querySelectorAll(selector);
+  return Array.prototype.filter.call(elements, function(element) {
+    return RegExp(text).test(element.textContent);
+  });
+}
+
+let obj = {
+  title: 'trick',
+  butt: 'poop',
+  youGay: 'crack'
+};
+let vcomp = injectVar(vdom, obj);
+
+if (!Object.compare(vdom, vcomp)) {
+  let arrChange = [];
+  let arrNewChange = [];
+
+  for (let i = 0, j = 0; i < Object.keys(vdom).length; i++, j++) {
+    let element = Object.keys(vdom)[i];
+    if (!Object.compare(vdom[element], vcomp[element])) {
+
+      arrNewChange.push(vcomp[element]);
+    }
+  }
+
+  for (let i = 0; i < arrNewChange.length; i++) {
+    arrChange.push((contains('prophet', Object.keys(obj)[i])));
+    for (let j = 0; j < arrChange[i].length; j++) {
+      change = arrChange[i];
+      change[j].innerHTML = arrNewChange[i].content;
+    }
+  }
 };
