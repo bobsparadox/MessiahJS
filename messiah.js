@@ -195,11 +195,19 @@ function contains(selector, text) {
   });
 }
 
+let keys = [];
+
 let obj = {
-  title: 'trick',
-  butt: 'poop',
-  youGay: 'crack'
+  title: 'this is from messiah js',
+  subtitle: 'from object in messiah',
+  inject: 'hello',
+  name: 'messiah'
 };
+
+for (let key in obj) {
+  keys.push(key);
+};
+
 let vcomp = injectVar(vdom, obj);
 
 if (!Object.compare(vdom, vcomp)) {
@@ -209,16 +217,16 @@ if (!Object.compare(vdom, vcomp)) {
   for (let i = 0, j = 0; i < Object.keys(vdom).length; i++, j++) {
     let element = Object.keys(vdom)[i];
     if (!Object.compare(vdom[element], vcomp[element])) {
-
       arrNewChange.push(vcomp[element]);
     }
   }
-
-  for (let i = 0; i < arrNewChange.length; i++) {
-    arrChange.push((contains('prophet', Object.keys(obj)[i])));
-    for (let j = 0; j < arrChange[i].length; j++) {
-      change = arrChange[i];
-      change[j].innerHTML = arrNewChange[i].content;
+  let proTags = document.getElementsByTagName('prophet');
+  for (let l = 0; l < proTags.length; l++) {
+    for (let k = 0; k < keys.length; k++) {
+      if (proTags[l].innerHTML == keys[k]) {
+        proTags[l].innerHTML = obj[keys[k]];
+      };
     }
-  }
+
+  };
 };
